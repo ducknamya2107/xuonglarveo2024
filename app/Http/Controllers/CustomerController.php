@@ -38,9 +38,9 @@ class CustomerController extends Controller
         $data = $request->validate([
             'name' => 'required|max:255',
             'address' => 'required|max:255',
-            // 'avatar' => 'nullable|image|max:2048',
+            'avatar' => 'nullable|image|max:2048',
             // 'avatar' =>'nullable|file|max:2048',
-            'avatar' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'avatar' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
             'phone' => ['required', 'string', 'max:20', Rule::unique('customers')],
             'email' => 'required|email|max:100',
             'is_active' => ['nullable', Rule::in([0, 1])],

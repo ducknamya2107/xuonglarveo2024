@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -109,31 +110,36 @@ Route::get('/', function () {
 //         ->get();
 //     dd($results);
 // });
-Route::get('/tongdoanhthutheothang', function () {
-    $results = DB::table('sales')
-        ->selectRaw('SUM(total) as total_sales, EXTRACT(MONTH FROM sale_date) as month, EXTRACT(YEAR FROM sale_date) as year')
-        ->groupByRaw('EXTRACT(MONTH FROM sale_date), EXTRACT(YEAR FROM sale_date)')
-        ->get();
+// Route::get('/tongdoanhthutheothang', function () {
+//     $results = DB::table('sales')
+//         ->selectRaw('SUM(total) as total_sales, EXTRACT(MONTH FROM sale_date) as month, EXTRACT(YEAR FROM sale_date) as year')
+//         ->groupByRaw('EXTRACT(MONTH FROM sale_date), EXTRACT(YEAR FROM sale_date)')
+//         ->get();
 
-    foreach ($results as $result) {
-        echo "Tháng {$result->month} năm {$result->year}: Tổng doanh thu = {$result->total_sales}<br>";
-        dd($results);
-    }
-});
-Route::get('/tongchiphitheothang', function () {
-    $results = DB::table('expenses')
-        ->selectRaw('SUM(amount) as total_expenses, EXTRACT(MONTH FROM expense_date) as month, EXTRACT(YEAR FROM expense_date) as year')
-        ->groupByRaw('EXTRACT(MONTH FROM expense_date), EXTRACT(YEAR FROM expense_date)')
-        ->get();
+//     foreach ($results as $result) {
+//         echo "Tháng {$result->month} năm {$result->year}: Tổng doanh thu = {$result->total_sales}<br>";
+//         dd($results);
+//     }
+// });
+// Route::get('/tongchiphitheothang', function () {
+//     $results = DB::table('expenses')
+//         ->selectRaw('SUM(amount) as total_expenses, EXTRACT(MONTH FROM expense_date) as month, EXTRACT(YEAR FROM expense_date) as year')
+//         ->groupByRaw('EXTRACT(MONTH FROM expense_date), EXTRACT(YEAR FROM expense_date)')
+//         ->get();
 
-    foreach ($results as $result) {
-        echo "Tháng {$result->month} năm {$result->year}: Tổng chi phí = {$result->total_expenses}<br>";
-    }
-    dd($results);
-});
+//     foreach ($results as $result) {
+//         echo "Tháng {$result->month} năm {$result->year}: Tổng chi phí = {$result->total_expenses}<br>";
+//     }
+//     dd($results);
+// });
 Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('customers', CustomerController::class);
-ROute::delete('customers/{customer}/forceDestroy', [CustomerController::class, 'forceDestroy'])
+Route::delete('customers/{customer}/forceDestroy', [CustomerController::class, 'forceDestroy'])
     ->name('customers.forceDestroy');
+
+
+Route::resource('employees', EmployeeController::class);
+Route::delete('employees/{employee}/forceDestroy', [EmployeeController::class, 'forceDestroy'])
+    ->name('employees.forceDestroy');

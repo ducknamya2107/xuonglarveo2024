@@ -18,11 +18,12 @@
         <nav class="nav justify-content-center  ">
             <a class="nav-link active" href="/" aria-current="page">Welcome</a>
             <a class="nav-link" href="{{ route('customers.index') }}">Quan li khach hang</a>
+            <a class="nav-link" href="{{ route('employees.index') }}">Quan li nhan vien</a>
             
         </nav>
 
     </header>
-    <main class="container">
+    <main class="container-fluid">
         @yield('content')
     </main>
     <footer>
