@@ -1,10 +1,21 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MovieController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TableuserController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Middleware\CheckAge;
+use App\Http\Middleware\CheckageMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +28,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 // Route::get('/jointables', function () {
 //     // return view('welcome');
@@ -132,14 +141,111 @@ Route::get('/', function () {
 //     }
 //     dd($results);
 // });
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+// Route::resource('customers', CustomerController::class);
+// Route::delete('customers/{customer}/forceDestroy', [CustomerController::class, 'forceDestroy'])
+//     ->name('customers.forceDestroy');
+
+
+
+// Route::resource('employees', EmployeeController::class);
+// Route::delete('employees/{employee}/forceDestroy', [EmployeeController::class, 'forceDestroy'])
+//     ->name('employees.forceDestroy');
+
+// Route::middleware([CheckageMiddleware::class])->group(function () {
+//     Route::resource('movies', MovieController::class);
+//     Route::get('/admin', function () {
+//         return view('admin.dashboard');
+//     });
+
+//     Route::get('/orders', function () {
+//         return view('orders.index');
+//     });
+
+//     Route::get('/profile', function () {
+//         return view('profile.index');
+//     });
+// });
+// Route cho admin
+// Route::get('/admin', function () {
+//     return 'Chào mừng admin!';
+// })->middleware('role');
+
+// // Route cho nhân viên
+// Route::get('/employee', function () {
+//     return 'Chào mừng nhân viên!';
+// })->middleware('role');
+
+// // Route cho khách hàng
+// Route::get('/customer', function () {
+//     return 'Chào mừng khách hàng!';
+// })->middleware('role');
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('customers', CustomerController::class);
-Route::delete('customers/{customer}/forceDestroy', [CustomerController::class, 'forceDestroy'])
-    ->name('customers.forceDestroy');
+
+Route::middleware(['role:admin'])->group(function () {
+    Route::resource('customers', CustomerController::class);
+    Route::delete('customers/{customer}/forceDestroy', [CustomerController::class, 'forceDestroy'])
+        ->name('customers.forceDestroy');
+
+    Route::resource('employees', EmployeeController::class);
+    Route::delete('employees/{employee}/forceDestroy', [EmployeeController::class, 'forceDestroy'])
+        ->name('employees.forceDestroy');
+});
+
+// Route cho nhân viên
+Route::middleware(['role:employee'])->group(function () {
+    Route::resource('employees', EmployeeController::class)->except(['destroy', 'forceDestroy']);
+    // Các route khác liên quan đến nhân viên
+});
+
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+// return về home nếu ko có quyền truy cập 
+Route::get('/', function () {
+    return view('welcome');
+});
 
 
-Route::resource('employees', EmployeeController::class);
-Route::delete('employees/{employee}/forceDestroy', [EmployeeController::class, 'forceDestroy'])
-    ->name('employees.forceDestroy');
+Auth::routes();
+
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+// Routes cho đăng nhập
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+// Route cho đăng xuất
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Route cho dashboard sau khi đăng nhập
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth')->name('home');
+
+
+// Route::post('/transaction/start', [TransactionController::class, 'startTransaction']);
+// Route::get('/transaction', [TransactionController::class, 'getTransaction']);
+// Route::post('/transaction/confirm', [TransactionController::class, 'confirmTransaction']);
+// Route::post('/transaction/complete', [TransactionController::class, 'completeTransaction']);
+
+Route::get('transactions', [TransactionController::class, 'index'])->name('index');
+Route::post('transactions', [TransactionController::class, 'startTransaction'])->name('start');
+
+Route::get('/transactions/review', [TransactionController::class, 'reviewTransaction'])->name('review');
+Route::post('/transactions/complete', [TransactionController::class, 'completeTransaction'])->name('complete');
+Route::post('/transactions/cancel', [TransactionController::class, 'cancelTransaction'])->name('cancel');
+
+Route::get('/transactions/success', [TransactionController::class, 'successTransaction'])->name('success');
+
+// API
+Route::apiResource('projects', ProjectController::class);
+
+Route::prefix('projects/{projectId}/tasks')->group(function () {
+    Route::apiResource('/', TaskController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+});
+
+Route::resource('students', StudentController::class);
